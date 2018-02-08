@@ -270,6 +270,25 @@ int power_supply_set_low_power_state(struct power_supply *psy, int value)
 }
 EXPORT_SYMBOL(power_supply_set_low_power_state);
 
+/* power_supply_get_battery_charge_state */
+int power_supply_get_battery_charge_state(struct power_supply *psy)
+{
+    union power_supply_propval ret = {0,};
+
+    if (!psy) {
+        pr_err("<%s> power supply is NULL\n", __func__);
+        return 0;
+    }
+
+    if (psy->get_property){
+        psy->get_property(psy, POWER_SUPPLY_PROP_PRESENT, &ret);
+    }
+
+    pr_debug("<%s> online: %d\n", __func__, ret.intval);
+    return ret.intval;
+}
+EXPORT_SYMBOL(power_supply_get_battery_charge_state);
+
 /**
  * power_supply_set_dp_dm -
  * @psy:	the power supply to control

@@ -31,11 +31,11 @@
 		};
 	};
 };
-
+/*
 &wled {
 	qcom,cons-sync-write-delay-us = <1000>;
 };
-
+*/
 &int_codec {
 	status = "okay";
 	qcom,msm-mbhc-hphl-swh = <1>;
@@ -168,7 +168,7 @@
 		status = "okay";
 	};
 };
-
+/*
 &pm8937_vadc {
 	/delete-node/ chan@11;
-};
+};*/

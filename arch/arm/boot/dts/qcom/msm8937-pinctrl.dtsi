@@ -69,7 +69,7 @@
 				/* suspended state */
 				mux {
 					pins = "gpio6", "gpio7";
-					function = "gpio";
+					function = "blsp_i2c2";
 				};
 
 				config {
@@ -175,6 +175,21 @@
 				bias-disable;
 			};
 		};
+
+		// +Other_platform modify 20160511 xuji.wt add charging debug
+		smb_int_pin {
+			//qcom,pins = <&gp 61>;
+			pins = "gpio61";
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "smb_int_gpio";
+			smb_int_default: smb_int_default {
+				drive-strength = <2>;	/*8 MA */
+				bias-pull-up;		/* PULL UP*/
+				
+			};
+		};
+		// -Other_platform modify 20160511 xuji.wt add charging debug
 
 		tlmm_pmi_flash_led {
 			rear_flash_led_enable: rear_flash_led_enable {
@@ -290,6 +305,20 @@
 			};
 		};
 
+		gpio_led_pins {
+			gpio_led_off: gpio_led_off {
+				mux {
+					pins = "gpio45";
+					function = "gpio";
+			 	};	
+				config {
+					pins = "gpio45";
+					drive-strength = <6>;
+					bias-pull-down;
+					output-low;	
+				};
+			};
+		};
 		wcnss_pmux_5wire {
 			/* Active configuration of bus pins */
 			wcnss_default: wcnss_default {
@@ -481,12 +510,12 @@
 
 		usbc_int_default: usbc_int_default {
 			mux {
-				pins = "gpio97", "gpio131";
+				pins = /*"gpio97",*/ "gpio131";
 				function = "gpio";
 			};
 
 			config {
-				pins = "gpio97", "gpio131";
+				pins = /*"gpio97",*/ "gpio131";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
