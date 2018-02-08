@@ -44,6 +44,11 @@ config QPNP_POWER_ON
 	  PNP PMIC. It currently supports reporting the change in status of
 	  the KPDPWR_N line (connected to the power-key).
 
+config MSM_VIBRATOR
+	tristate "Vibrator Driver"
+	help
+	  This driver supports the vibrator functionality on Qualcomm
+
 config QPNP_REVID
 	tristate "QPNP Revision ID Peripheral"
 	depends on SPMI || MSM_SPMI
