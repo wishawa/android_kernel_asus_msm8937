@@ -569,6 +569,17 @@ static void qpnp_lpg_calc_pwm_value(struct _qpnp_pwm_config *pwm_config,
 		tmp = period_value >> pwm_config->period.pwm_size;
 		pwm_config->pwm_value = duty_value / tmp;
 	}
+
+//Start:Bug194232,liuyang3.wt,add,20160718, hardware test.
+#ifdef CONFIG_K89200_FEATURES
+	if (pwm_config->pwm_value <= 255){
+		pwm_config->pwm_value = (pwm_config->pwm_value + 1) / 2;
+	} else {
+		pwm_config->pwm_value = pwm_config->pwm_value / 2 * 3 - 254;
+	}
+#endif
+//End:Bug194232,liuyang3.wt,add,20160718, hardware test.
+
 	max_pwm_value = (1 << pwm_config->period.pwm_size) - 1;
 	if (pwm_config->pwm_value > max_pwm_value)
 		pwm_config->pwm_value = max_pwm_value;
@@ -761,9 +772,27 @@ static int qpnp_lpg_glitch_removal(struct qpnp_pwm_chip *chip, bool enable)
 
 static int qpnp_lpg_configure_pwm(struct qpnp_pwm_chip *chip)
 {
+#ifndef CONFIG_K89200_FEATURES
 	struct qpnp_lpg_config	*lpg_config = &chip->lpg_config;
+#endif
 	int rc;
+	u8 reg =0;
 
+#ifdef CONFIG_K89200_FEATURES
+	pr_info("====== wangs: <%s> spmi write 0x07 -> 0xBC41\n", __func__);
+	reg = 0x07;
+	rc = spmi_ext_register_writel(chip->spmi_dev->ctrl, chip->spmi_dev->sid,
+			0xBC41, &reg, 1);
+	if (rc)
+		return rc;
+
+	pr_info("====== wangs: <%s> spmi write 0x01 -> 0xBC42\n", __func__);
+	reg = 0x01;
+	rc = spmi_ext_register_writel(chip->spmi_dev->ctrl, chip->spmi_dev->sid,
+			0xBC42, &reg, 1);
+	if (rc)
+		return rc;
+#else
 	pr_debug("pwm_size_clk: %d\n",
 		chip->qpnp_lpg_registers[QPNP_LPG_PWM_SIZE_CLK]);
 	rc = spmi_ext_register_writel(chip->spmi_dev->ctrl, chip->spmi_dev->sid,
@@ -781,6 +810,7 @@ static int qpnp_lpg_configure_pwm(struct qpnp_pwm_chip *chip)
 		&chip->qpnp_lpg_registers[QPNP_LPG_PWM_FREQ_PREDIV_CLK], 1);
 	if (rc)
 		return rc;
+#endif
 
 	/* Disable glitch removal when LPG/PWM is configured */
 	rc = qpnp_lpg_glitch_removal(chip, false);

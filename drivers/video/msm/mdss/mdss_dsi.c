@@ -302,6 +302,16 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 		pr_err("%s: failed to disable vregs for %s\n",
 			__func__, __mdss_dsi_pm_name(DSI_PANEL_PM));
 
+//Start:Reqxxx,liuyang3.wt,ADD,20160628,for control tps65132.
+#ifdef CONFIG_K89200_FEATURES
+	msleep(5);
+	ret= gpio_direction_output(125, 0);
+	gpio_free(125);
+	msleep(5);
+	ret= gpio_direction_output(126, 0);
+	gpio_free(126);
+#endif
+//End:Reqxxx,liuyang3.wt,ADD,20160628,for control tps65132.
 end:
 	return ret;
 }
@@ -326,6 +336,30 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 			__func__, __mdss_dsi_pm_name(DSI_PANEL_PM));
 		return ret;
 	}
+
+//Start:Reqxxx,liuyang3.wt,ADD,20160628,for control tps65132.
+#ifdef CONFIG_K89200_FEATURES
+	pr_info("====== wangs: <%s> LCD config GPIO\n", __func__);
+	ret= gpio_request(126, "LCD_vsp_en");
+	if (ret) {
+		pr_err("request lcd_vsp_en gpio failed, rc=%d\n", ret);
+	}
+	ret= gpio_direction_output(126, 1);
+	if (ret) {
+		pr_err("%s: unable to set dir for lcd_vsp_en gpio\n", __func__);
+	}
+	msleep(2);
+	ret = gpio_request(125, "LCD_vsn_en");
+	if (ret) {
+		pr_err("request lcd_vsn_en gpio failed, rc=%d\n", ret);
+	}
+	ret = gpio_direction_output(125, 1);
+	if (ret) {
+		pr_err("%s: unable to set dir for lcd_vsn_en gpio\n", __func__);
+	}
+	msleep(5);
+#endif
+//End:Reqxxx,liuyang3.wt,ADD,20160628,for control tps65132.
 
 	/*
 	 * If continuous splash screen feature is enabled, then we need to
