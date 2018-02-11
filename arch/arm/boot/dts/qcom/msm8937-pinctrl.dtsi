@@ -186,7 +186,7 @@
 			smb_int_default: smb_int_default {
 				drive-strength = <2>;	/*8 MA */
 				bias-pull-up;		/* PULL UP*/
-				
+
 			};
 		};
 		// -Other_platform modify 20160511 xuji.wt add charging debug
@@ -310,12 +310,12 @@
 				mux {
 					pins = "gpio45";
 					function = "gpio";
-			 	};	
+			 	};
 				config {
 					pins = "gpio45";
 					drive-strength = <6>;
 					bias-pull-down;
-					output-low;	
+					output-low;
 				};
 			};
 		};
@@ -1098,6 +1098,36 @@
 				};
 			};
 		};
+		/* laser power enable gpio */
+		pmx_laser_pwr_active {
+			laser_pwr_active: laser_pwr_active {
+				mux {
+					pins = "gpio25";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio25";
+					drive-strength = <8>;
+					bias-pull-up;
+				};
+			};
+		};
+
+		pmx_laser_pwr_suspend {
+			laser_pwr_suspend: laser_pwr_suspend {
+				mux {
+					pins = "gpio25";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio25";
+					drive-strength = <2>;
+					bias-pull-down;
+				};
+			};
+		};
 		pri-tlmm-lines {
 			pri_tlmm_lines_act: pri_tlmm_lines_act {
 				mux {
@@ -1436,6 +1466,36 @@
 				drive-strength = <2>; /* 2 MA */
 			};
 		};
+		//add by allenyao for flash driver ic
+
+		cam_flash_driver_default: cam_flash_driver_default {
+			/* flash driver ic */
+			mux {
+				pins = "gpio93","gpio90";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio93","gpio90";
+				bias-disable; /* No PULL */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+
+		cam_flash_driver_sleep: cam_flash_driver_sleep {
+			/* flash driver ic */
+			mux {
+				pins = "gpio93","gpio90";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio93","gpio90";
+				bias-disable; /* No PULL */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+		//end
 
 		cam_sensor_mclk1_default: cam_sensor_mclk1_default {
 			/* MCLK1 */
