@@ -25,6 +25,7 @@
 #include <linux/input.h>
 #include <linux/firmware.h>
 #include <linux/completion.h>
+#include <linux/switch.h>
 #include <sound/soc.h>
 #include <sound/jack.h>
 #include "wcd-mbhc-v2.h"
@@ -45,7 +46,7 @@
 #define MBHC_BUTTON_PRESS_THRESHOLD_MIN 250
 #define GND_MIC_SWAP_THRESHOLD 4
 #define WCD_FAKE_REMOVAL_MIN_PERIOD_MS 100
-#define HS_VREF_MIN_VAL 1400
+#define HS_VREF_MIN_VAL 1600
 #define FW_READ_ATTEMPTS 15
 #define FW_READ_TIMEOUT 4000000
 #define FAKE_REM_RETRY_ATTEMPTS 3
@@ -54,6 +55,7 @@
 #define WCD_MBHC_BTN_PRESS_COMPL_TIMEOUT_MS  50
 #define ANC_DETECT_RETRY_CNT 7
 #define WCD_MBHC_SPL_HS_CNT  2
+static struct switch_dev mbhc_data;
 
 static int det_extn_cable_en;
 module_param(det_extn_cable_en, int,
@@ -474,6 +476,8 @@ static void wcd_mbhc_clr_and_turnon_hph_padac(struct wcd_mbhc *mbhc)
 	}
 	mutex_unlock(&mbhc->hphl_pa_lock);
 
+	mbhc->pa_turned_by_mbhc = pa_turned_on;
+
 	if (pa_turned_on) {
 		pr_debug("%s: PA was turned on by MBHC and not by DAPM\n",
 			 __func__);
@@ -553,6 +557,7 @@ static void wcd_mbhc_hs_elec_irq(struct wcd_mbhc *mbhc, int irq_type,
 static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 				enum snd_jack_types jack_type)
 {
+	int state = 0;
 	struct snd_soc_codec *codec = mbhc->codec;
 	bool is_pa_on = false;
 
@@ -560,6 +565,13 @@ static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 
 	pr_debug("%s: enter insertion %d hph_status %x\n",
 		 __func__, insertion, mbhc->hph_status);
+
+	if(insertion) {
+		state = (jack_type == SND_JACK_HEADPHONE) ? 2 : 1;
+	}
+
+	switch_set_state((struct switch_dev *)&mbhc_data, state);
+
 	if (!insertion) {
 		/* Report removal */
 		mbhc->hph_status &= ~jack_type;
@@ -600,7 +612,13 @@ static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 			 jack_type, mbhc->hph_status);
 		wcd_mbhc_jack_report(mbhc, &mbhc->headset_jack,
 				mbhc->hph_status, WCD_MBHC_JACK_MASK);
-		wcd_mbhc_set_and_turnoff_hph_padac(mbhc);
+
+		if(mbhc->pa_turned_by_mbhc) {
+			wcd_mbhc_set_and_turnoff_hph_padac(mbhc);
+		} else {
+			pr_debug("%s@%d PA was turned off by DAPM and not by MBHC\n", __func__, __LINE__);
+		}
+
 		hphrocp_off_report(mbhc, SND_JACK_OC_HPHR);
 		hphlocp_off_report(mbhc, SND_JACK_OC_HPHL);
 		mbhc->current_plug = MBHC_PLUG_TYPE_NONE;
@@ -1182,6 +1200,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 
 
 	/* Enable HW FSM */
+	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_FSM_EN, 0);
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_FSM_EN, 1);
 	/*
 	 * Check for any button press interrupts before starting 3-sec
@@ -2130,8 +2149,8 @@ static int wcd_mbhc_initialise(struct wcd_mbhc *mbhc)
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_HS_L_DET_PULL_UP_COMP_CTRL, 1);
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_L_DET_EN, 1);
 
-	/* Insertion debounce set to 96ms */
-	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_INSREM_DBNC, 6);
+	/* Insertion debounce set to 512ms */
+	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_INSREM_DBNC, 0x0B);
 	/* Button Debounce set to 16ms */
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_DBNC, 2);
 
@@ -2552,6 +2571,14 @@ int wcd_mbhc_init(struct wcd_mbhc *mbhc, struct snd_soc_codec *codec,
 		goto err_hphr_ocp_irq;
 	}
 
+	mbhc_data.name = "h2w";
+	mbhc_data.index = 0;
+	mbhc_data.state = 0;
+	ret = switch_dev_register(&mbhc_data);
+	if(ret) {
+		pr_err("%s: Failed to register a switch device\n", __func__);
+	}
+
 	pr_debug("%s: leave ret %d\n", __func__, ret);
 	return ret;
 
@@ -2582,6 +2609,8 @@ EXPORT_SYMBOL(wcd_mbhc_init);
 void wcd_mbhc_deinit(struct wcd_mbhc *mbhc)
 {
 	struct snd_soc_codec *codec = mbhc->codec;
+
+	switch_dev_unregister(&mbhc_data);
 
 	mbhc->mbhc_cb->free_irq(codec, mbhc->intr_ids->mbhc_sw_intr, mbhc);
 	mbhc->mbhc_cb->free_irq(codec, mbhc->intr_ids->mbhc_btn_press_intr,

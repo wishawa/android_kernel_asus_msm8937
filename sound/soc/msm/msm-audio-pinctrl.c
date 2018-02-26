@@ -70,10 +70,25 @@ int msm_get_gpioset_index(enum pinctrl_client client, char *keyword)
  * 1. Problem reading from dtsi file
  * 2. Memory allocation failure
  */
+
+//begin add by jiayu read GPIO (104 105 106 109)to distinguish HW config at 20160923
+int G_04 = 0;
+int G_05 = 0;
+int G_06 = 0;
+int G_09 = 0;
+//end add by jiayu read GPIO (104 105 106 109)to distinguish HW config at 20160923
+
 int msm_gpioset_initialize(enum pinctrl_client client,
 				struct device *dev)
 {
 	struct pinctrl *pinctrl;
+	struct pinctrl_state *pinctrl_state_ana_switch;
+
+	struct pinctrl_state *rf_config04;  //add by jiayu for HW require
+	struct pinctrl_state *rf_config05;  //add by jiayu for HW require
+	struct pinctrl_state *rf_config06;  //add by jiayu for HW require
+	struct pinctrl_state *rf_config09;  //add by jiayu for HW require
+
 	const char *gpioset_names = "qcom,msm-gpios";
 	const char *gpioset_combinations = "qcom,pinctrl-names";
 	const char *gpioset_names_str = NULL;
@@ -195,6 +210,69 @@ int msm_gpioset_initialize(enum pinctrl_client client,
 				__func__, gpioset_info[client].
 						gpiosets_comb_names[i]);
 	}
+	pinctrl_state_ana_switch = pinctrl_lookup_state(pinctrl, "pmx_analog_switch");
+	ret = pinctrl_select_state(pinctrl, pinctrl_state_ana_switch);
+	if (ret < 0) {
+		dev_err(dev, "failed to select analog_switch_gpio pin to active state");
+	}
+	/* init the ANALOG enable pin */
+	ret = gpio_request(129, "analog_en");
+	if (!ret) {
+		gpio_direction_output(129, 1);
+		gpio_set_value(129, 1);
+		pr_info("%s: set gpio 129 high\n", __func__);
+	}
+/*begin add by jindong read GPIO (104 105 106 109)to distinguish HW config at 20160923  */
+	rf_config04 = pinctrl_lookup_state(pinctrl, "pmx_rf_read_gpio04");
+	ret = pinctrl_select_state(pinctrl, rf_config04);
+	if (ret < 0) {
+		dev_err(dev, " jiayu failed to select analog_switch_gpio pin to active state");
+	}
+	ret = gpio_request(104, "rf_GPIO4");
+	if (!ret) {
+		gpio_direction_input(104);
+		G_04 = gpio_get_value(104);
+		dev_err(dev,"jiayu get gpio 104 %d: \n", G_04);
+	}
+
+	rf_config05 = pinctrl_lookup_state(pinctrl, "pmx_rf_read_gpio05");
+	ret = pinctrl_select_state(pinctrl, rf_config05);
+	if (ret < 0) {
+		dev_err(dev, " jindong failed to select analog_switch_gpio pin to active state");
+	}
+	ret = gpio_request(105, "rf_GPIO5");
+	if (!ret) {
+		gpio_direction_input(105);
+		G_05 = gpio_get_value(105);
+		dev_err(dev,"jiayu get gpio 105 %d: \n", G_05);
+	}
+
+	rf_config06 = pinctrl_lookup_state(pinctrl, "pmx_rf_read_gpio06");
+	ret = pinctrl_select_state(pinctrl, rf_config06);
+	if (ret < 0) {
+		dev_err(dev, " jindong failed to select analog_switch_gpio pin to active state");
+	}
+	ret = gpio_request(106, "rf_GPIO6");
+	if (!ret) {
+		gpio_direction_input(106);
+		G_06 = gpio_get_value(106);
+		dev_err(dev,"jindong get gpio 106 %d: \n", G_06);
+	}
+
+	rf_config09 = pinctrl_lookup_state(pinctrl, "pmx_rf_read_gpio09");
+	ret = pinctrl_select_state(pinctrl, rf_config09);
+	if (ret < 0) {
+		dev_err(dev, " jindong failed to select analog_switch_gpio pin to active state");
+	}
+	ret = gpio_request(109, "rf_GPIO4");
+	if (!ret) {
+		gpio_direction_input(109);
+		G_09 = gpio_get_value(109);
+		dev_err(dev,"jindong get gpio 109 %d: \n", G_09);
+	}
+/* end add by jindong read GPIO (104 105 106 109)to distinguish HW config at 20160923  */
+
+	ret = 0;
 	goto success;
 
 err:
@@ -226,6 +304,14 @@ err:
 success:
 	return ret;
 }
+
+int tempj = 0;
+int get_io_value(void)
+{
+	tempj = G_04<<3|G_06<<2|G_05<<1|G_09;
+	return tempj;
+}
+EXPORT_SYMBOL(get_io_value);
 
 int msm_gpioset_activate(enum pinctrl_client client, char *keyword)
 {

@@ -264,11 +264,14 @@ int is_ext_spk_gpio_support(struct platform_device *pdev,
 	return 0;
 }
 
+#define EXT_PA_MODE 3
+
 static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 {
 	struct snd_soc_card *card = codec->component.card;
 	struct msm8916_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
 	int ret;
+	int i;
 
 	if (!gpio_is_valid(pdata->spk_ext_pa_gpio)) {
 		pr_err("%s: Invalid gpio: %d\n", __func__,
@@ -286,7 +289,19 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 					__func__, "ext_spk_gpio");
 			return ret;
 		}
-		gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, enable);
+		pr_debug("%s: set the mode of the external PA\n", __func__);
+
+		preempt_disable();
+		for(i=0; i<EXT_PA_MODE; i++)
+		{
+			ndelay(2000);
+			gpio_set_value(pdata->spk_ext_pa_gpio, 0);
+			ndelay(2000);
+			gpio_set_value(pdata->spk_ext_pa_gpio, 1);
+		}
+		preempt_enable();
+
+		msleep(45);	// 42ms to 50ms, make sure the mode is built
 	} else {
 		gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, enable);
 		ret = msm_gpioset_suspend(CLIENT_WCD_INT, "ext_spk_gpio");
@@ -1631,16 +1646,16 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	 * 210-290 == Button 2
 	 * 360-680 == Button 3
 	 */
-	btn_low[0] = 75;
-	btn_high[0] = 75;
+	btn_low[0] = 115;
+	btn_high[0] = 115;
 	btn_low[1] = 150;
 	btn_high[1] = 150;
-	btn_low[2] = 225;
-	btn_high[2] = 225;
-	btn_low[3] = 450;
-	btn_high[3] = 450;
-	btn_low[4] = 500;
-	btn_high[4] = 500;
+	btn_low[2] = 325;
+	btn_high[2] = 325;
+	btn_low[3] = 650;
+	btn_high[3] = 650;
+	btn_low[4] = 700;
+	btn_high[4] = 700;
 
 	return msm8952_wcd_cal;
 }
