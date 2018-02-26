@@ -40,15 +40,32 @@
 	status = "okay";
 	qcom,msm-mbhc-hphl-swh = <1>;
 	qcom,msm-gpios =
-		"pri_i2s";
+		"pri_i2s",
+		"ext_spk_gpio";
 	qcom,pinctrl-names =
 		"all_off",
-		"pri_i2s_act";
+		"pri_i2s_act",
+		"ext_pa_act",
+		"pri_i2s_ext_pa_active";
 	pinctrl-names =
 		"all_off",
-		"pri_i2s_act";
-	pinctrl-0 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus>;
-	pinctrl-1 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act>;
+		"pri_i2s_act",
+		"ext_pa_act",
+		"pri_i2s_ext_pa_active",
+		"pmx_analog_switch",
+		"pmx_rf_read_gpio04",
+		"pmx_rf_read_gpio05",
+		"pmx_rf_read_gpio06",
+		"pmx_rf_read_gpio09";
+	pinctrl-0 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus &ext_pa_gpio_sus>;
+	pinctrl-1 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act &ext_pa_gpio_sus>;
+	pinctrl-2 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus &ext_pa_gpio_act>;
+	pinctrl-3 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act &ext_pa_gpio_act>;
+	pinctrl-4 = <&analog_switch_active>;
+	pinctrl-5 = <&rf_read_gpio04_active>;
+	pinctrl-6 = <&rf_read_gpio05_active>;
+	pinctrl-7 = <&rf_read_gpio06_active>;
+	pinctrl-8 = <&rf_read_gpio09_active>;
 	qcom,cdc-us-euro-gpios;
 	qcom,msm-hs-micbias-type = "internal";
 	qcom,audio-routing =

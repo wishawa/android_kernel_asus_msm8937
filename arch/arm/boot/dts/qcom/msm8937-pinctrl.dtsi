@@ -1011,6 +1011,157 @@
 			};
 		};
 
+		/* Audio config pin */
+		pmx_audio_ext_pa {
+			ext_pa_gpio_act: ext_pa_on {
+				mux {
+					pins = "gpio124";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio124";
+					drive-strength = <8>;
+				};
+			};
+
+			ext_pa_gpio_sus: ext_pa_off {
+				mux {
+					pins = "gpio124";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio124";
+					drive-strength = <2>;
+				output-low;
+					bias-pull-down;
+				};
+			};
+		};
+
+		pmx_analog_switch {
+			analog_switch_active: analog_switch_active {
+				mux {
+					pins = "gpio129";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio129";
+					drive-strength = <2>;
+					bias-pull-up;
+				};
+			};
+		};
+		pmx_rf_read_gpio04{
+			rf_read_gpio04_active: rf_read_gpio04_active{
+				mux {
+					pins = "gpio104";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio104";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+			rf_read_gpio04_sus:rf_read_gpio04_sus{
+				mux {
+					pins = "gpio104";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio104";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+		};
+		pmx_rf_read_gpio05{
+			rf_read_gpio05_active: rf_read_gpio05_active{
+				mux {
+					pins = "gpio105";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio105";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+			rf_read_gpio05_sus:rf_read_gpio05_sus{
+				mux {
+					pins = "gpio105";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio105";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+		};
+		pmx_rf_read_gpio06{
+			rf_read_gpio06_active: rf_read_gpio06_active{
+				mux {
+					pins = "gpio106";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio106";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+			rf_read_gpio06_sus:rf_read_gpio06_sus{
+				mux {
+					pins = "gpio106";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio106";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+		};
+		pmx_rf_read_gpio09{
+			rf_read_gpio09_active: rf_read_gpio09_active{
+				mux {
+					pins = "gpio109";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio109";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+			rf_read_gpio09_sus:rf_read_gpio09_sus{
+				mux {
+					pins = "gpio109";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio109";
+					bias-pull-up; /* pull up */
+					drive-strength = <8>; /* 2 MA */
+					input-enable;
+				};
+			};
+		};
 		/* WSA VI sense */
 		wsa-vi {
 			wsa_vi_on: wsa_vi_on {
