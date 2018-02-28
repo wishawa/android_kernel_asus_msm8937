@@ -96,6 +96,7 @@ struct lm3642_chip_data {
 static int lm3642_chip_init(struct lm3642_chip_data *chip)
 {
 	int ret;
+  	dev_err("lm3642_chip_init\n");
 	struct lm3642_platform_data *pdata = chip->pdata;
 
 	/* set enable register */

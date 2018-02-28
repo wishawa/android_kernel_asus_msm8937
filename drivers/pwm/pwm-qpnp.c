@@ -779,14 +779,14 @@ static int qpnp_lpg_configure_pwm(struct qpnp_pwm_chip *chip)
 	u8 reg =0;
 
 #ifdef CONFIG_K89200_FEATURES
-	pr_info("====== wangs: <%s> spmi write 0x07 -> 0xBC41\n", __func__);
+	//pr_info("wangmin ====== wangs: <%s> spmi write 0x07 -> 0xBC41\n", __func__);
 	reg = 0x07;
 	rc = spmi_ext_register_writel(chip->spmi_dev->ctrl, chip->spmi_dev->sid,
 			0xBC41, &reg, 1);
 	if (rc)
 		return rc;
 
-	pr_info("====== wangs: <%s> spmi write 0x01 -> 0xBC42\n", __func__);
+	//pr_info("wangmin ====== wangs: <%s> spmi write 0x01 -> 0xBC42\n", __func__);
 	reg = 0x01;
 	rc = spmi_ext_register_writel(chip->spmi_dev->ctrl, chip->spmi_dev->sid,
 			0xBC42, &reg, 1);
