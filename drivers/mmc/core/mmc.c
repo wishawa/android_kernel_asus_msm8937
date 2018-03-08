@@ -25,7 +25,7 @@
 #include "bus.h"
 #include "mmc_ops.h"
 #include "sd_ops.h"
-
+extern char emmc_info[20];  //mmc dev_info
 static const unsigned int tran_exp[] = {
 	10000,		100000,		1000000,	10000000,
 	0,		0,		0,		0
@@ -110,7 +110,32 @@ static int mmc_decode_cid(struct mmc_card *card)
 			mmc_hostname(card->host), card->csd.mmca_vsn);
 		return -EINVAL;
 	}
-
+ //start: add emmc hardware infomation, by chenjindong, 2017/01/16
+    switch(card->cid.manfid)
+    {
+		case 0x15:
+			if((0x51 == card->cid.prod_name[0]))
+				strcpy(emmc_info, "KMQX10013M_B419");
+			else if((0x52 == card->cid.prod_name[0])&& (0x42 == card->cid.prod_name[3])) 
+				strcpy(emmc_info, "KMRX1000BM_B614");
+			if((0x52 == card->cid.prod_name[0]) && (0x34 == card->cid.prod_name[3]))
+				strcpy(emmc_info, "KMRX10014M_B614");
+			else
+				strcpy(emmc_info, "Unknown device");
+			//strncat(emmc_info, card->cid.prod_name, strlen(card->cid.prod_name));
+			break;
+		case 0x90:
+			if(0x42 == card->cid.prod_name[1])
+				strcpy(emmc_info, "H9TQ26AXXTACUR_KUM");
+			else
+				strcpy(emmc_info, "Unknown device");
+			//strncat(emmc_info, card->cid.prod_name, strlen(card->cid.prod_name));
+			break;
+		default:
+			strcpy(emmc_info, "Unknown device");
+			break;
+    }
+    //End: add emmc hardware infomation, by chenjindong, 2017/01/16
 	return 0;
 }
 
@@ -461,6 +486,7 @@ static int mmc_read_ext_csd(struct mmc_card *card, u8 *ext_csd)
 		ext_csd[EXT_CSD_ERASE_TIMEOUT_MULT];
 	card->ext_csd.raw_hc_erase_grp_size =
 		ext_csd[EXT_CSD_HC_ERASE_GRP_SIZE];
+	card->ext_csd.pre_eol_info=ext_csd[EXT_CSD_PRE_EOL_INFO]; //add by chenjindong
 	if (card->ext_csd.rev >= 3) {
 		u8 sa_shift = ext_csd[EXT_CSD_S_A_TIMEOUT];
 		card->ext_csd.part_config = ext_csd[EXT_CSD_PART_CONFIG];
@@ -829,6 +855,7 @@ MMC_DEV_ATTR(raw_rpmb_size_mult, "%#x\n", card->ext_csd.raw_rpmb_size_mult);
 MMC_DEV_ATTR(enhanced_rpmb_supported, "%#x\n",
 		card->ext_csd.enhanced_rpmb_supported);
 MMC_DEV_ATTR(rel_sectors, "%#x\n", card->ext_csd.rel_sectors);
+MMC_DEV_ATTR(preeolinfo,"%x\n", card->ext_csd.pre_eol_info); //add by chenjindong
 
 static struct attribute *mmc_std_attrs[] = {
 	&dev_attr_cid.attr,
@@ -851,6 +878,7 @@ static struct attribute *mmc_std_attrs[] = {
 	&dev_attr_raw_rpmb_size_mult.attr,
 	&dev_attr_enhanced_rpmb_supported.attr,
 	&dev_attr_rel_sectors.attr,
+	&dev_attr_preeolinfo.attr,
 	NULL,
 };
 ATTRIBUTE_GROUPS(mmc_std);

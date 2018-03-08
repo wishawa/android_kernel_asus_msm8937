@@ -739,6 +739,9 @@ static int gpio_keys_probe(struct platform_device *pdev)
 	int i, error;
 	int wakeup = 0;
 	struct pinctrl_state *set_state;
+	struct pinctrl_state *cardTray_state;  //add by jiayu for cardTray check 
+	int ret = 0;						  //add by jiayu for cardTray check
+	int cardTrayState = 0;				  //add by jiayu for cardTray check
 
 	if (!pdata) {
 		pdata = gpio_keys_get_devtree_pdata(dev);
@@ -792,6 +795,27 @@ static int gpio_keys_probe(struct platform_device *pdev)
 		pr_debug("Target does not use pinctrl\n");
 		ddata->key_pinctrl = NULL;
 	}
+	/**********************begin-add by dingjiayu for cardtray check*************************/
+	if (ddata->key_pinctrl != NULL)
+	{
+		cardTray_state = pinctrl_lookup_state(ddata->key_pinctrl,"cardTray_gpio67");
+		ret = pinctrl_select_state(ddata->key_pinctrl, cardTray_state);
+		if (ret < 0) 
+		{		
+			dev_err(dev, "jiayu failed to select cardTray_gpio67 to active state");
+		}
+		ret = gpio_request(67, "cardTray_GPIO67");
+		dev_err(dev, " jiayu ret = %d \n",ret);
+		if (ret < 0)
+		{ 	
+			gpio_direction_input(67);
+			cardTrayState = gpio_get_value(67);
+			dev_err(dev,"jiayu get gpio 67 %d: \n", cardTrayState); 
+		}
+
+		ret = 0;
+	}
+	/**********************end-add by dingjiayu for cardtray check*************************/
 
 	if (ddata->key_pinctrl) {
 		error = gpio_keys_pinctrl_configure(ddata, true);
@@ -853,6 +877,52 @@ err_setup_key:
 	return error;
 }
 
+/**********************begin-add by dingjiayu for cardtray check*************************/
+
+
+int get_cardTray_State(void)
+{
+	struct pinctrl_state *cardTray_pin;  //add by jiayu for cardTray check 
+	int ret = 0;
+	int cardTrayState = 0;
+	struct pinctrl *pinctrl;
+
+	// Get pinctrl if target uses pinctrl 
+	pinctrl = devm_pinctrl_get(global_dev);
+	if (IS_ERR(pinctrl)) {
+		if (PTR_ERR(pinctrl) == -EPROBE_DEFER)
+			return -EPROBE_DEFER;
+
+		pr_debug("Target does not use pinctrl\n");
+		pinctrl = NULL;
+	}
+
+	if (pinctrl != NULL)
+	{
+		cardTray_pin = pinctrl_lookup_state(pinctrl,"cardTray_gpio67");
+		ret = pinctrl_select_state(pinctrl, cardTray_pin);
+		if (ret < 0) 
+		{		
+			dev_err(global_dev, " jiayu failed to select cardTray_gpio67 to active state");
+		}
+		ret = gpio_request(67, "cardTray_GPIO67");
+		if (ret < 0) 
+		{ 	gpio_direction_input(67);
+			cardTrayState = gpio_get_value(67);
+			dev_err(global_dev,"jiayu get gpio 67 %d: \n", cardTrayState); 
+		}
+
+		ret = 0;
+
+	}
+
+	return cardTrayState;
+
+
+}
+EXPORT_SYMBOL(get_cardTray_State);
+
+/**********************end-add by dingjiayu for cardtray check*************************/
 static int gpio_keys_remove(struct platform_device *pdev)
 {
 	sysfs_remove_group(&pdev->dev.kobj, &gpio_keys_attr_group);

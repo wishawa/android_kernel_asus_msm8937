@@ -17,6 +17,7 @@
 #include <linux/notifier.h>
 
 #define MMC_CARD_CMDQ_BLK_SIZE 512
+#define EXT_CSD_PRE_EOL_INFO 267 /* RO*/ 
 
 struct mmc_cid {
 	unsigned int		manfid;
