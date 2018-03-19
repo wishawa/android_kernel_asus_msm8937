@@ -118,13 +118,11 @@ e0 2a
 		qcom,esd-check-enabled;
 		qcom,mdss-dsi-panel-status-check-mode = "reg_read";
 		qcom,mdss-dsi-panel-status-command
-			= [14 01 00 01 05 00 02 D0 00
-			14 01 00 01 05 00 02 0A 00
-			14 01 00 01 05 00 02 45 00
+			= [14 01 00 01 05 00 02 0A 00
 			06 01 00 01 05 00 02 09 00];
 		qcom,mdss-dsi-panel-status-command-state = "dsi_lp_mode";
-		qcom,mdss-dsi-panel-status-read-length = <1 1 1 3>;
-		qcom,mdss-dsi-panel-status-value = <0x39 0x9D 0x07 0x80 0x73 0x04>;
+		qcom,mdss-dsi-panel-status-read-length = <1 3>;
+		qcom,mdss-dsi-panel-status-value = <0x9D 0x80 0x73 0x04>;
 		qcom,mdss-pan-physical-width-dimension = <68>;
 		qcom,mdss-pan-physical-height-dimension = <121>;
 	};

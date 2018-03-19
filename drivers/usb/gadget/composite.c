@@ -2336,7 +2336,9 @@ composite_suspend(struct usb_gadget *gadget)
 	cdev->suspended = 1;
 	spin_unlock_irqrestore(&cdev->lock, flags);
 
-	usb_gadget_vbus_draw(gadget, 2);
+/*[PLATFORM]-Add-BEGIN by pingao.yang, 2016/10/14, PR-191893, fixed charge error connect usb to PC*/
+	usb_gadget_vbus_draw(gadget, 500);
+/*[PLATFORM]-Add-END by pingao.yang*/
 }
 
 static void

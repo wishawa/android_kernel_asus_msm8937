@@ -26,6 +26,7 @@
 #include <linux/uaccess.h>
 #include <linux/msm-bus.h>
 #include <linux/pm_qos.h>
+#include <linux/hardware_info.h> //add hardware info for factory mode
 
 #include "mdss.h"
 #include "mdss_panel.h"
@@ -36,6 +37,7 @@
 
 #define XO_CLK_RATE	19200000
 #define CMDLINE_DSI_CTL_NUM_STRING_LEN 2
+extern char Lcm_name[HARDWARE_MAX_ITEM_LONGTH];  ////add LCD hardware info for factory mode
 
 /* Master structure to hold all the information about the DSI/panel */
 static struct mdss_dsi_data *mdss_dsi_res;
@@ -339,7 +341,7 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 
 //Start:Reqxxx,liuyang3.wt,ADD,20160628,for control tps65132.
 #ifdef CONFIG_K89200_FEATURES
-	pr_info("====== wangs: <%s> LCD config GPIO\n", __func__);
+	//pr_info("====== wangs: <%s> LCD config GPIO\n", __func__);
 	ret= gpio_request(126, "LCD_vsp_en");
 	if (ret) {
 		pr_err("request lcd_vsp_en gpio failed, rc=%d\n", ret);
@@ -2849,6 +2851,27 @@ static struct device_node *mdss_dsi_pref_prim_panel(
 
 	return dsi_pan_node;
 }
+
+//Start:Reqxxx,liuyang3.wt,ADD,20160314,add hardware info for factory mode.
+void process_lcd_info(char *lcm_info, const char *panel_name)
+{
+    char* prefix = "qcom,mdss_dsi_";
+    int plen ,strl =0;
+    plen = strlen(prefix);
+    strl = strlen(panel_name);
+
+    if(strl>plen)
+    {
+	//memset(lcm_info, 0, sizeof(lcm_info));
+	strncpy(lcm_info,panel_name+plen,strl-plen);
+	lcm_info[strl-plen] = '\0';
+    }
+
+	pr_info("%s: lcd_info = %s\n",__func__,lcm_info);
+	return;
+ }
+//End:Reqxxx,liuyang3.wt,ADD,20160314,add hardware info for factory mode.
+
 
 /**
  * mdss_dsi_find_panel_of_node(): find device node of dsi panel

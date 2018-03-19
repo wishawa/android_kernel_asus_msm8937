@@ -486,7 +486,7 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			usleep_range(100, 110);
 			gpio_free(ctrl_pdata->disp_en_gpio);
 		}
-		gpio_set_value((ctrl_pdata->rst_gpio), 0);
+		gpio_set_value((ctrl_pdata->rst_gpio), 1);
 		gpio_free(ctrl_pdata->rst_gpio);
 		if (gpio_is_valid(ctrl_pdata->mode_gpio))
 			gpio_free(ctrl_pdata->mode_gpio);
@@ -1689,6 +1689,7 @@ static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 	int i, j;
 	int len = 0, *lenp;
 	int group = 0;
+	int err_count = 0;
 
 	lenp = ctrl->status_valid_params ?: ctrl->status_cmds_rlen;
 
@@ -1697,9 +1698,14 @@ static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 
 	for (j = 0; j < ctrl->groups; ++j) {
 		for (i = 0; i < len; ++i) {
-			if (ctrl->return_buf[i] !=
-				ctrl->status_value[group + i])
-				break;
+			pr_debug("ctrl->return_buf[%d] = 0x%x\n", i, ctrl->return_buf[i]);//add for debug.
+			if (ctrl->return_buf[i] != ctrl->status_value[group + i]){
+				err_count++;
+				pr_err("%s status_value[%d] = 0x%x, ctrl->return_buf[%d] = 0x%x\n", 
+					__func__, group + i, ctrl->status_value[group + i], i, ctrl->return_buf[i]);
+				if (err_count > 1)
+					break;
+			}
 		}
 
 		if (i == len)

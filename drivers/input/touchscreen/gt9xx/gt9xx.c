@@ -20,7 +20,7 @@
 
 #include <linux/irq.h>
 #include "gt9xx.h"
-//#include <linux/hardware_info.h> //add hardware info for factory mode
+#include <linux/hardware_info.h> //add hardware info for factory mode
 #include <linux/kthread.h>
 
 #if GTP_ICS_SLOT_REPORT
@@ -131,12 +131,12 @@ typedef enum
     DOZE_WAKEUP = 2,
 }DOZE_T;
 #define GESTURE_NODE "goodix_gesture"
-#define GESTURE_NUM  (7)
+#define GESTURE_NUM  (8)
 int gesture_enabled = 0;    /* module switch */
 static DOZE_T doze_status = DOZE_DISABLED;
 static int gestures_flag; /* gesture flag, every bit stands for a gesture, [7]- all sawitch [6:0] = w, s, e, c, z, v, double click.  */
-static u8 gestures_data[GESTURE_NUM] = {'w', 's', 'e', 'c', 'z', 'v', 0xcc}; /*  ASUS surport gesture type, 5e - Double click. */ 
-static const int  gesture_key_codes[GESTURE_NUM] = {KEY_W, KEY_S, KEY_E, KEY_C, KEY_Z, KEY_V, KEY_POWER};
+static u8 gestures_data[GESTURE_NUM] = {'w', 's', 'e', 'c', 'z', 'v', 0xcc, 0xBA}; /*  ASUS surport gesture type, 5e - Double click. */
+static const int  gesture_key_codes[GESTURE_NUM] = {KEY_W, KEY_S, KEY_E, KEY_C, KEY_Z, KEY_V, KEY_POWER, KEY_F24};
 
 static s8 gtp_enter_doze(struct goodix_ts_data *ts);
 static ssize_t gt9xx_gesture_switch_read(struct file *file, char __user * page, size_t size, loff_t * ppos);
@@ -1760,7 +1760,7 @@ static ssize_t gt9xx_gesture_switch_write(struct file *filp, const char __user *
 	}
 	GTP_DEBUG("gestures_flag = %d, ret:%d \n", gestures_flag, ret);
 	//add anhengxuan.wt 2016.8.4  for bug204083  dclik don't wake up screen
-	if ((gestures_flag - 0x80) > 0 ||(gestures_flag==0x01)){
+	if ((gestures_flag - 0x100) > 0 || (gestures_flag == 0x01) || (gestures_flag == 0x02)){
 	//end anhengxuan.wt 2016.8.4 for bug204083  dclik don't wake up screen
 	//if ((gestures_flag - (0x1 << GESTURE_NUM)) > 0 ){
 	//if (mask - (0x1 << GESTURE_NUM)){  
@@ -2054,6 +2054,7 @@ static s8 gtp_request_input_dev(struct goodix_ts_data *ts)
 #if GTP_GESTURE_WAKEUP
     input_set_capability(ts->input_dev, EV_KEY, KEY_POWER);
     input_set_capability(ts->input_dev, EV_KEY, KEY_F23);
+    input_set_capability(ts->input_dev, EV_KEY, KEY_F24);
     input_set_capability(ts->input_dev, EV_KEY, KEY_W);
     input_set_capability(ts->input_dev, EV_KEY, KEY_S);
     input_set_capability(ts->input_dev, EV_KEY, KEY_E);
@@ -2635,7 +2636,7 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
     s32 ret = -1;
     struct goodix_ts_data *ts;
     u16 version_info;
-    //char tp_info[HARDWARE_MAX_ITEM_LONGTH] = "0"; //add hardware info for factory mode.
+    char tp_info[HARDWARE_MAX_ITEM_LONGTH] = "0"; //add hardware info for factory mode.
     //GTP_DEBUG_FUNC();
     
     //do NOT remove these logs
@@ -2814,14 +2815,14 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
     init_wr_node(client);
 #endif
 //Start:Reqxxx,liuyang3.wt,ADD,20160314,	add hardware info for factory mode.
-/*
+
 	sprintf(tp_info,"vendor:Eachopto,ic:GT915L,version:0x%x",version_info);
 	ret = hardwareinfo_set_prop(HARDWARE_TP,tp_info);
     if (ret < 0){
 	    GTP_ERROR("[TP] Failed to hardwareinfo_set_prop, %d\n",ret);
 		//return -1;
     }
-*/
+
 //End:Reqxxx,liuyang3.wt,ADD,20160314,add hardware info for factory mode.	
 	 return ret;
 out:
