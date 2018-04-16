@@ -237,6 +237,7 @@ static uint16_t msm_sensor_id_by_mask(struct msm_sensor_ctrl_t *s_ctrl,
 	return sensor_id;
 }
 
+extern  char hardwareinfo_name[15][64];
 int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc = 0;
@@ -271,6 +272,35 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 
 	pr_debug("%s: read id: 0x%x expected id 0x%x:\n",
 			__func__, chipid, slave_info->sensor_id);
+	if(0x885a==chipid){
+		strcpy(hardwareinfo_name[3],"ov8856");
+		strcpy(hardwareinfo_name[14],"sunny");
+		pr_err("allenyao-front camera is %s,module is %s\n",hardwareinfo_name[3],hardwareinfo_name[14]);
+	}else if(0x3103==chipid){
+		strcpy(hardwareinfo_name[4],"s5k3p3");
+		strcpy(hardwareinfo_name[13],"ofilm");
+		pr_err("allenyao-back camera is %s,module is %s\n",hardwareinfo_name[4],hardwareinfo_name[13]);
+	}
+	else if(0x5e80==chipid){
+		strcpy(hardwareinfo_name[3],"s5k5e8");
+		strcpy(hardwareinfo_name[14],"ofilm");
+		pr_err("allenyao-front camera is %s,module is %s\n",hardwareinfo_name[3],hardwareinfo_name[14]);
+	}
+	else if(0xd853==chipid){
+		strcpy(hardwareinfo_name[4],"ov13853");
+		strcpy(hardwareinfo_name[13],"sunny");
+		pr_err("allenyao-back camera is %s,module is %s\n",hardwareinfo_name[4],hardwareinfo_name[13]);
+	}
+		else if(0x5675==chipid){
+		strcpy(hardwareinfo_name[3],"ov5675");
+		strcpy(hardwareinfo_name[14],"sunny");
+		pr_err("allenyao-front camera is %s,module is %s\n",hardwareinfo_name[3],hardwareinfo_name[14]);
+	}
+	else if(0x30c8==chipid){
+		strcpy(hardwareinfo_name[4],"s5k3l8");
+		strcpy(hardwareinfo_name[13],"ofilm");
+		pr_err("allenyao-back camera is %s,module is %s\n",hardwareinfo_name[4],hardwareinfo_name[13]);
+	}
 	if (msm_sensor_id_by_mask(s_ctrl, chipid) != slave_info->sensor_id) {
 		pr_err("%s chip id %x does not match %x\n",
 				__func__, chipid, slave_info->sensor_id);

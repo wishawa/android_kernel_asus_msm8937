@@ -77,7 +77,6 @@ static void msm_led_torch_brightness_set(struct led_classdev *led_cdev,
 		if(fctrl.func_tbl->flash_led_off)
 			fctrl.func_tbl->flash_led_off(&fctrl);
 	}
-	pr_err("wangmin msm_led_torch_brightness_set\n");
 };
 
 static struct led_classdev msm_torch_led = {
@@ -169,7 +168,6 @@ int msm_flash_sy7806_led_init(struct msm_led_flash_ctrl_t *fctrl)
 	struct msm_camera_power_ctrl_t *power_info = NULL;
 	//char data[0];	int reset_value=0;
 	sy7806_DBG("%s:%d called\n", __func__, __LINE__);
-	pr_err("wangmin msm_flash_sy7806_led_init\n");
 
 	flashdata = fctrl->flashdata;
 	power_info = &flashdata->power_info;
@@ -291,7 +289,6 @@ int msm_flash_sy7806_led_off(struct msm_led_flash_ctrl_t *fctrl)
 	char data[0];	int enable_value=0;
 
 	sy7806_DBG("%s:%d called\n", __func__, __LINE__);
-	pr_err("wangmin msm_flash_sy7806_led_off\n");
 
 	if (!fctrl || !fctrl->flashdata) {
 		pr_err("%s:%d fctrl NULL\n", __func__, __LINE__);
@@ -366,7 +363,6 @@ int msm_flash_sy7806_led_low(struct msm_led_flash_ctrl_t *fctrl)
 	uint32_t curren_0_reg_val=0,curren_1_reg_val=0;
 	int enable_value=0;char data[0];	int reset_value=0;
 	sy7806_DBG("%s:%d called\n", __func__, __LINE__);
-	pr_err("wangmin msm_flash_sy7806_led_low\n");
 
 	flashdata = fctrl->flashdata;
 	power_info = &flashdata->power_info;
@@ -635,7 +631,6 @@ int msm_flash_sy7806_led_high(struct msm_led_flash_ctrl_t *fctrl)
 	uint32_t curren_0_reg_val=0,curren_1_reg_val=0;
 	int enable_value=0;char data[0];int reset_value=0;
 	sy7806_DBG("%s:%d called\n", __func__, __LINE__);
-	pr_err("wangmin msm_flash_sy7806_led_high\n");
 
 	flashdata = fctrl->flashdata;
 
@@ -1059,7 +1054,6 @@ static int msm_flash_sy7806_i2c_probe(struct i2c_client *client,
 	struct msm_camera_power_ctrl_t *power_info = NULL;
 	int rc = 0 ;
 	sy7806_DBG("%s entry\n", __func__);
-	pr_err("wangmin msm_flash_sy7806_i2c_probe\n");
 	if (!id) {
 		pr_err("msm_flash_sy7806_i2c_probe: id is NULL");
 		id = sy7806_i2c_id;
@@ -1185,10 +1179,8 @@ static struct i2c_driver sy7806_i2c_driver = {
 static int __init msm_flash_sy7806_init(void)
 {
 	struct proc_dir_entry *mytest_file;
-	pr_err("wangmin msm_flash_sy7806_init 1\n");
 	mytest_file=proc_create("driver/asus_flash_brightness", 0x0644, NULL, &sy7806_fops);
 	sy7806_DBG("%s entry\n", __func__);
-	pr_err("wangmin msm_flash_sy7806_init 2\n");
 	return i2c_add_driver(&sy7806_i2c_driver);
 }
 

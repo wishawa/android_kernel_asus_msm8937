@@ -849,8 +849,8 @@ int msm_flash_i2c_probe(struct i2c_client *client,
 		fctrl->flash_i2c_client->client = client;
 	/* Set device type as I2C */
 	fctrl->flash_device_type = MSM_CAMERA_I2C_DEVICE;
-	pr_err("%s %d,allenyao pr_err\n", __func__,__LINE__);
-	printk("%s %d,allenyao\n", __func__,__LINE__);
+	//pr_err("%s %d,allenyao pr_err\n", __func__,__LINE__);
+	//printk("%s %d,allenyao\n", __func__,__LINE__);
 	/* Assign name for sub device */
 	snprintf(fctrl->msm_sd.sd.name, sizeof(fctrl->msm_sd.sd.name),
 		"%s", id->name);
