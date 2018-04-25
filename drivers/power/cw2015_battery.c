@@ -1409,7 +1409,16 @@ static int battery_master_calibration_batt_capacity(struct  cw_battery *cw_bat, 
 
 	cw_bat->last_capacity = capacity;
 	if (cw_bat->capacity_limit != true) {
-		cw_bat->last_soc = capacity;
+
+                if((cw_bat->last_soc ==  39) || (int)abs(cw_bat->last_soc - capacity) >= 10)
+                {
+                    cw_bat->last_soc = capacity;
+                 }
+                else
+                {
+                soc_change = min((int)abs(cw_bat->last_soc - capacity), 1);
+		cw_bat->last_soc = (cw_bat->last_soc >= capacity ? cw_bat->last_soc -soc_change:cw_bat->last_soc +soc_change);
+               }
 		cw_bat->last_soc_change_time = now_tm_sec;
 		return cw_bat->last_soc;
 	}
