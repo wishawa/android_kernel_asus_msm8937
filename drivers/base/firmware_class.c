@@ -1145,7 +1145,7 @@ fw_load_from_user_helper(struct firmware *firmware,
 /* No abort during direct loading */
 #define is_fw_load_aborted(buf) false
 
-#ifdef CONFIG_PM_SLEEP
+#ifdef CONFIG_FW_CACHE
 static inline void kill_requests_without_uevent(void) { }
 #endif
 
