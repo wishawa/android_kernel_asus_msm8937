@@ -22,7 +22,7 @@
 #include "gt9xx.h"
 #include <linux/hardware_info.h> //add hardware info for factory mode
 #include <linux/kthread.h>
-
+#include <linux/switch.h>
 #if GTP_ICS_SLOT_REPORT
     #include <linux/input/mt.h>
 #endif
@@ -2631,12 +2631,23 @@ Output:
     Executive outcomes. 
         0: succeed.
 *******************************************************/
+static struct switch_dev switch_fw_version;
+u32 test_sensor_id = 0x2020;
+static ssize_t switch_fw_version_read(struct switch_dev *sdev, char *buf)
+{
+    s32 ret = -1;
+    ret += sprintf(buf, "IC Version: 0x%04X\n",test_sensor_id);
+    return ret;
+}
+
 static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
     s32 ret = -1;
     struct goodix_ts_data *ts;
     u16 version_info;
     char tp_info[HARDWARE_MAX_ITEM_LONGTH] = "0"; //add hardware info for factory mode.
+    switch_fw_version.name = "touch";
+    switch_fw_version.print_name = switch_fw_version_read;
     //GTP_DEBUG_FUNC();
     
     //do NOT remove these logs
@@ -2822,6 +2833,11 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
 	    GTP_ERROR("[TP] Failed to hardwareinfo_set_prop, %d\n",ret);
 		//return -1;
     }
+	ret = switch_dev_register(&switch_fw_version);
+	if(ret < 0)
+	{
+		GTP_ERROR("[GTP]Register switch device error.\n");
+	}
 
 //End:Reqxxx,liuyang3.wt,ADD,20160314,add hardware info for factory mode.	
 	 return ret;
