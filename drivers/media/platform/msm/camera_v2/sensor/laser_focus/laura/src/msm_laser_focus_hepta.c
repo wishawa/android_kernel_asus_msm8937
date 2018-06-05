@@ -626,6 +626,11 @@ static int ATD_Laura_device_get_range_read_more_info(struct seq_file *buf, void 
 	}
 	LOG_Handler(LOG_CDBG, "%s : Get range (%d)  Device (%d)\n", __func__, RawRange , laura_t->device_state);
 
+	if(9999 == RawRange)
+        {
+           ErrCode = 0;
+        }
+
 	seq_printf(buf, "%d#%d#%d\n", RawRange, DMax, ErrCode);
 	if(proc_read_value_cnt > 1000)
 		proc_read_value_cnt=0;
