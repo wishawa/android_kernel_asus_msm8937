@@ -38,7 +38,7 @@
     qcom,float-voltage-mv = <4400>;	//set float voltage to 4400mV by yangpingao.wt 20160805
     qcom,recharge-mv = <100>;	//set recharge voltage to 4280mV by yangpingao.wt 20160711
     regulator-name = "smb358_otg_vreg";
-    qcom,thermal-mitigation = <1500 1000 700 500>;	//set thermal-mitigation to 1500mA by yangpingao.wt 20160711
+    qcom,thermal-mitigation = <1500 1500 1500 1500>;	//set thermal-mitigation to 1500mA by yangpingao.wt 20160711
     qcom,fastchg-current-max-ma = <1500>;	//set fastchg current to 1500mA by yangpingao.wt 20160711
     qcom,bms-psy-name = "bms";
     //qcom,iterm-disabled;
