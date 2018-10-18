@@ -182,7 +182,7 @@ static int wt_phoneinfo_write(wt_phoneinfo_type type, const char* buf, int len)
 	if(buf_tmp[len-1] == '\n')
 	buf_tmp[len-1] = 0x00;
 
-	fp = filp_open(PHONE_INFO_PATH, O_RDWR | O_CREAT, 0);
+	fp = filp_open(PHONE_INFO_PATH, O_RDWR | O_CREAT, 0644);
 	if (IS_ERR(fp))
 	{
 	    printk("[RTX] %s: open phone info path error\n", __func__);
@@ -192,7 +192,9 @@ static int wt_phoneinfo_write(wt_phoneinfo_type type, const char* buf, int len)
 	fs = get_fs();
 	set_fs(KERNEL_DS);
 
-	fp->f_pos = fp->f_pos + WT_PHONEINFO_STRING_LEN*type;
+	printk("%s file offset=%d!\n", __func__, type);
+	//fp->f_pos = fp->f_pos + WT_PHONEINFO_STRING_LEN*type;
+	fp->f_op->llseek(fp, WT_PHONEINFO_STRING_LEN*type, SEEK_CUR);
 	ret = fp->f_op->write(fp, buf_tmp, len, &fp->f_pos);
 	if (ret != len) {
 	    printk("%s: Write phoneinfo failed! %d\n", __func__, ret);
