@@ -1159,6 +1159,12 @@ static int smb358_get_prop_batt_status(struct smb358_charger *chip)
 	}
 /*[PLATFORM]-Add-END by pingao.yang */
 
+	if (chip->capacity == CHARGE_FULL_CAPACITY && chip->power_ok) {
+		dev_err(chip->dev, "%s, [dihongwei] report charge full status when soc==100!\n",__func__);
+		//__smb358_charging_disable(chip, true);
+		return POWER_SUPPLY_STATUS_FULL;
+	}
+
 	if ((reg & STATUS_C_CHARGING_MASK) &&
 			!(reg & STATUS_C_CHG_ERR_STATUS_BIT) && chip->power_ok)
 		return POWER_SUPPLY_STATUS_CHARGING;
