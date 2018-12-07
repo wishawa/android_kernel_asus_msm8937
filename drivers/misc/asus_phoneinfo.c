@@ -182,7 +182,7 @@ static int wt_phoneinfo_write(wt_phoneinfo_type type, const char* buf, int len)
 	if(buf_tmp[len-1] == '\n')
 	buf_tmp[len-1] = 0x00;
 
-	fp = filp_open(PHONE_INFO_PATH, O_RDWR | O_CREAT, 0644);
+	fp = filp_open(PHONE_INFO_PATH, O_RDWR | O_CREAT, 0);
 	if (IS_ERR(fp))
 	{
 	    printk("[RTX] %s: open phone info path error\n", __func__);
