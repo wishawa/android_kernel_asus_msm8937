@@ -1128,8 +1128,8 @@ static int smb358_get_prop_batt_status(struct smb358_charger *chip)
 	}
 
 	chip->capacity = smb358_get_prop_batt_capacity(chip);
-	dev_dbg(chip->dev, "batt_full = %d, chip->chg_finish = %d, capacity = %d, power_ok = %d\n",
-				chip->batt_full, chip->chg_finish, chip->capacity, chip->power_ok);
+	//dev_dbg(chip->dev, "batt_full = %d, chip->chg_finish = %d, capacity = %d, power_ok = %d\n",
+	//			chip->batt_full, chip->chg_finish, chip->capacity, chip->power_ok);
 
 	if (!chip->power_ok && chip->chg_finish) {
 		chip->chg_finish = false;
@@ -3077,8 +3077,8 @@ static void dump_regs(struct smb358_charger *chip)
 		if (rc)
 			dev_err(chip->dev, "Couldn't read 0x%02x rc = %d\n",
 					addr, rc);
-		else
-			pr_err("0x%02x = 0x%02x\n", addr, reg);
+		//else
+			//pr_err("0x%02x = 0x%02x\n", addr, reg);
 	}
 
 	//for (addr = FIRST_STATUS_REG; addr <= LAST_STATUS_REG; addr++) {
@@ -3087,8 +3087,8 @@ static void dump_regs(struct smb358_charger *chip)
 		if (rc)
 			dev_err(chip->dev, "Couldn't read 0x%02x rc = %d\n",
 					addr, rc);
-		else
-			pr_err("STATUS_REG:0x%02x = 0x%02x\n", addr, reg);
+		//else
+			//pr_err("STATUS_REG:0x%02x = 0x%02x\n", addr, reg);
 	}
 
 	//for (addr = FIRST_CMD_REG; addr <= LAST_CMD_REG; addr++) {
@@ -3097,8 +3097,8 @@ static void dump_regs(struct smb358_charger *chip)
 		if (rc)
 			dev_err(chip->dev, "Couldn't read 0x%02x rc = %d\n",
 					addr, rc);
-		else
-			pr_err("CMD_REG:0x%02x = 0x%02x\n", addr, reg);
+		//else
+			//pr_err("CMD_REG:0x%02x = 0x%02x\n", addr, reg);
 	}
 }
 #else
@@ -3489,8 +3489,8 @@ static void smb358_get_charge_status(struct smb358_charger *chip)
 
 	chip->charger_type = chip->power_ok;
 
-	dev_err(chip->dev, "STATUS_C_REG = %x,  STATUS_D_REG = %x, ntc_temp = %d\n",
-						chip->charge_status, chip->charger_type, chip->ntc_temp);
+	//dev_err(chip->dev, "STATUS_C_REG = %x,  STATUS_D_REG = %x, ntc_temp = %d\n",
+	//					chip->charge_status, chip->charger_type, chip->ntc_temp);
 
 }
 
@@ -3505,24 +3505,24 @@ static void ntc_protection_wakelock_enable(struct smb358_charger *chip)
 		wake_unlock(&chip->monitor_wake_lock);
 	}
 
-	dev_err(chip->dev, "charger_type = %s, charge_status = %s, wake_lock = %s\n",
-					chip->charger_type ? "charger" : "no charger",
-					chip->charge_status ? "charging" : "not charging",
-					wake_lock_active(&chip->monitor_wake_lock) ? "active" : "inactive");
+	//dev_err(chip->dev, "charger_type = %s, charge_status = %s, wake_lock = %s\n",
+	//				chip->charger_type ? "charger" : "no charger",
+	//				chip->charge_status ? "charging" : "not charging",
+	//				wake_lock_active(&chip->monitor_wake_lock) ? "active" : "inactive");
 }
 
 static void ntc_protection_notification(struct smb358_charger *chip)
 {
-	dev_err(chip->dev, "[allan]:temp = %d, low_temp = %d, high_temp = %d\n", 
-			chip->ntc_temp, chip->adc_param.low_temp, chip->adc_param.high_temp);
+	//dev_err(chip->dev, "[allan]:temp = %d, low_temp = %d, high_temp = %d\n", 
+	//		chip->ntc_temp, chip->adc_param.low_temp, chip->adc_param.high_temp);
 	
 	if (chip->ntc_temp <= chip->adc_param.low_temp) {
 		smb_chg_adc_notification(ADC_TM_HIGH_STATE, chip);
 	} else if (chip->ntc_temp >= chip->adc_param.high_temp) {
 		smb_chg_adc_notification(ADC_TM_LOW_STATE, chip);
-	} else {
-		dev_err(chip->dev, "ntc temp not trigger ! temp = %d\n", chip->ntc_temp);
-	}
+	}// else {
+		//dev_err(chip->dev, "ntc temp not trigger ! temp = %d\n", chip->ntc_temp);
+	//}
 }
 
 static void ntc_protection_monitor_work_callback(struct work_struct *work)
